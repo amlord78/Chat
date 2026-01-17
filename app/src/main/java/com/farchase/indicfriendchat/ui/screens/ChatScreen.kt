@@ -148,12 +148,16 @@ fun ChatScreen(graph: AppGraph) {
                     }
                 }
 
-                IconButton(onClick = {
-                    val last = msgs.lastOrNull()
-                    if (last != null && last.role == "assistant") speak(last.content)
-                }) {
-                    Icon(Icons.Default.VolumeUp, contentDescription = "Speak last reply")
-                }
+           IconButton(onClick = {
+    val t = input.trim()
+    if (t.isNotEmpty()) {
+        input = ""          // clear UI
+        vm.send(t)          // send real text
+    }
+}) {
+    Icon(Icons.Default.Send, contentDescription = null)
+}
+
 
                 Spacer(Modifier.width(6.dp))
 
