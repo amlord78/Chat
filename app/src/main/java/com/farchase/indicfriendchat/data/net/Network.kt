@@ -8,7 +8,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import okhttp3.MediaType.Companion.toMediaType
 
 object Network {
-    const val BASE_URL = "http://10.0.2.2:8000" // change for real phone/VPS
+    const val BASE_URL = "http://72.61.224.147:8000" // change for real phone/VPS
 
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
