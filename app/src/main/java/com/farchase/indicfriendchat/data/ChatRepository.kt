@@ -1,3 +1,22 @@
+class ChatRepository(private val api: ChatApi)
+private fun provideChatRepository(context: Context): ChatRepository {
+    return ChatRepository(Network.api) // or Network.service depending your file
+}
+class ChatRepository(private val baseUrl: String)
+private fun provideChatRepository(context: Context): ChatRepository {
+    return ChatRepository(BuildConfig.BASE_URL)
+}
+
+class ChatRepository(
+    private val api: ChatApi,
+    private val profileStore: ProfileStore
+)
+
+private fun provideChatRepository(context: Context): ChatRepository {
+    val store = ProfileStore(context)
+    return ChatRepository(Network.api, store)
+}
+
 package com.farchase.indicfriendchat.data
 
 import android.content.Context
