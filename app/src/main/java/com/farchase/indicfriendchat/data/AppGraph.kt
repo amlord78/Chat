@@ -3,6 +3,24 @@ package com.farchase.indicfriendchat.data
 import android.content.Context
 
 class AppGraph(context: Context) {
+    private val ctx = context.applicationContext
+
+    val profileStore: ProfileStore = ProfileStore(ctx)
+
+    // ✅ You must match YOUR ChatRepository constructor here
+    val repo: ChatRepository = provideChatRepository(ctx)
+}
+
+private fun provideChatRepository(ctx: Context): ChatRepository {
+    // ✅ Replace this ONE line based on ChatRepository.kt constructor
+    return ChatRepository(/* your required params here */)
+}
+
+package com.farchase.indicfriendchat.data
+
+import android.content.Context
+
+class AppGraph(context: Context) {
     val appContext: Context = context.applicationContext
 
     val profileStore: ProfileStore = ProfileStore(appContext)
