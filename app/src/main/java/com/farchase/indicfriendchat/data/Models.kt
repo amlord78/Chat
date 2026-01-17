@@ -62,3 +62,10 @@ data class ChatRequest(
 
 @Serializable
 data class ChatResponse(val reply: String)
+
+@Serializable
+data class ChatRequest(
+    val message: String,        // ✅ MUST be "message"
+    val profile: Profile,
+    val historyWindow: List<ChatMsg> = emptyList()
+)
