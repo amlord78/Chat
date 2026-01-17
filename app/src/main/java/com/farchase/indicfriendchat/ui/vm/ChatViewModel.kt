@@ -2,6 +2,7 @@ package com.farchase.indicfriendchat.ui.vm
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.tasks.await
 import androidx.lifecycle.viewModelScope
 import com.farchase.indicfriendchat.data.BotProfile
 import com.farchase.indicfriendchat.data.ChatRepository
