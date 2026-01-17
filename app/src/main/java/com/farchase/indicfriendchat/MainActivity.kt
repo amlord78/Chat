@@ -11,7 +11,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(color = MaterialTheme.colorScheme.background) { AppNav() }
+            // ✅ Material3 theme provider (prevents crash)
+            MaterialTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    AppNav()
+                }
+            }
         }
     }
 }
