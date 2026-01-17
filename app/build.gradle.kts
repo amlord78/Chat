@@ -9,6 +9,14 @@ android {
     namespace = "com.farchase.indicfriendchat"
     compileSdk = 34
 
+kotlinOptions {
+    freeCompilerArgs += listOf(
+        "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+        "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi"
+    )
+}
+
+
     defaultConfig {
         applicationId = "com.farchase.indicfriendchat"
         minSdk = 24
@@ -16,6 +24,14 @@ android {
         versionCode = 2
         versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+javaCompileOptions {
+    annotationProcessorOptions {
+        arguments += mapOf("room.schemaLocation" to "$projectDir/schemas")
+    }
+}
+
+
+
     }
 
     buildTypes {
