@@ -3,8 +3,38 @@ package com.farchase.indicfriendchat.data
 import android.content.Context
 
 class AppGraph(context: Context) {
-    val profileStore: ProfileStore = ProfileStore(context.applicationContext)
+    val appContext: Context = context.applicationContext
 
-    // TODO: set correct repo constructor in Step 2
-    val repo: ChatRepository = provideChatRepository(context.applicationContext)
+    val profileStore: ProfileStore = ProfileStore(appContext)
+
+    // ✅ Create repo via helper (choose correct line inside below)
+    val repo: ChatRepository = provideChatRepository(appContext)
+}
+
+/**
+ * ✅ IMPORTANT:
+ * Uncomment ONLY ONE return line below depending on ChatRepository constructor.
+ */
+private fun provideChatRepository(ctx: Context): ChatRepository {
+
+    // --- Case A: ChatRepository() has EMPTY constructor
+    // return ChatRepository()
+
+    // --- Case B: ChatRepository(context: Context)
+    // return ChatRepository(ctx)
+
+    // --- Case C: ChatRepository(baseUrl: String)
+    // return ChatRepository("http://YOUR_SERVER_IP:8000")
+
+    // --- Case D: ChatRepository(api: ChatApi)
+    // return ChatRepository(Network.api)
+
+    // --- Case E: ChatRepository(api: ChatApi, context: Context)
+    // return ChatRepository(Network.api, ctx)
+
+    // --- Case F: ChatRepository(api: ChatApi, profileStore: ProfileStore)
+    // return ChatRepository(Network.api, ProfileStore(ctx))
+
+    // If you don't know, start with EMPTY constructor check first.
+    throw IllegalStateException("Select correct ChatRepository constructor in provideChatRepository()")
 }
