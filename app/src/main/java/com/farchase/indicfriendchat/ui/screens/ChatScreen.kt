@@ -37,18 +37,27 @@ fun ChatScreen(graph: AppGraph) {
 
     var input by remember { mutableStateOf("") }
 
-    // TTS
+    // ✅ TTS (safe)
     val ttsRef = remember { mutableStateOf<TextToSpeech?>(null) }
-    DisposableEffect(Unit) {
-        val tts = TextToSpeech(ctx) { }
+    DisposableEffect(ctx) {
+        val tts = TextToSpeech(ctx) { /* ignore */ }
         ttsRef.value = tts
-        onDispose { tts.stop(); tts.shutdown() }
+        onDispose {
+            try { ttsRef.value?.stop() } catch (_: Exception) {}
+            try { ttsRef.value?.shutdown() } catch (_: Exception) {}
+            ttsRef.value = null
+        }
     }
+
     fun speak(text: String) {
         val tts = ttsRef.value ?: return
-        tts.language = Locale.getDefault()
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "BOT_REPLY")
+        try {
+            tts.language = Locale.getDefault()
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "BOT_REPLY")
+        } catch (_: Exception) { }
     }
+
+    // Auto speak last assistant reply if enabled
     LaunchedEffect(msgs.size, ui.profile.voiceReplyEnabled) {
         if (!ui.profile.voiceReplyEnabled) return@LaunchedEffect
         val last = msgs.lastOrNull() ?: return@LaunchedEffect
@@ -57,12 +66,16 @@ fun ChatScreen(graph: AppGraph) {
 
     // Mic permission
     var hasMicPermission by remember { mutableStateOf(false) }
-    val permLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    val permLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
         hasMicPermission = granted
     }
 
     // Voice recognition
-    val voiceLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    val voiceLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         val data = result.data
         val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
         val spokenText = matches?.firstOrNull()
@@ -100,7 +113,13 @@ fun ChatScreen(graph: AppGraph) {
         }
     ) { pad ->
         Column(modifier = Modifier.padding(pad).fillMaxSize()) {
-            ui.error?.let { Text("Error: $it", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(12.dp)) }
+            ui.error?.let {
+                Text(
+                    "Error: $it",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
 
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth().padding(12.dp),
@@ -112,7 +131,10 @@ fun ChatScreen(graph: AppGraph) {
 
             Divider()
 
-            Row(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 OutlinedTextField(
                     value = input,
                     onValueChange = { input = it },
@@ -121,17 +143,28 @@ fun ChatScreen(graph: AppGraph) {
                 )
 
                 if (ui.profile.voiceInputEnabled) {
-                    IconButton(onClick = { startVoiceInput() }) { Icon(Icons.Default.Mic, contentDescription = "Voice input") }
+                    IconButton(onClick = { startVoiceInput() }) {
+                        Icon(Icons.Default.Mic, contentDescription = "Voice input")
+                    }
                 }
 
                 IconButton(onClick = {
                     val last = msgs.lastOrNull()
                     if (last != null && last.role == "assistant") speak(last.content)
-                }) { Icon(Icons.Default.VolumeUp, contentDescription = "Speak last reply") }
+                }) {
+                    Icon(Icons.Default.VolumeUp, contentDescription = "Speak last reply")
+                }
 
                 Spacer(Modifier.width(6.dp))
 
-                Button(onClick = { val t = input; input = ""; vm.send(t) }, enabled = !ui.isSending) { Text("Send") }
+                Button(
+                    onClick = {
+                        val t = input.trim()
+                        if (t.isNotEmpty()) vm.send(t)
+                        input = ""
+                    },
+                    enabled = !ui.isSending
+                ) { Text("Send") }
             }
         }
     }
@@ -140,7 +173,10 @@ fun ChatScreen(graph: AppGraph) {
 @Composable
 private fun MessageBubble(m: ChatMessage) {
     val isUser = m.role == "user"
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+    ) {
         Surface(shape = RoundedCornerShape(16.dp), tonalElevation = 1.dp) {
             Text(m.content, modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp))
         }
